@@ -25,6 +25,8 @@ import torch
 # - Class to handle the process parameters
 # - Inherits PyCore.CWorkflowTaskParam from Ikomia API
 # --------------------
+
+
 class InferYoloV8PoseEstimationParam(core.CWorkflowTaskParam):
 
     def __init__(self):
@@ -78,16 +80,17 @@ class InferYoloV8PoseEstimation(dataprocess.CKeypointDetectionTask):
         self.model_name = None
         self.classes = ["person"]
         self.skeleton = [[16, 14], [14, 12], [17, 15], [15, 13], [12, 13], [6, 12],
-                    [7, 13], [6, 7], [6, 8], [7, 9], [8, 10], [9, 11], [2, 3],
-                    [1, 2], [1, 3], [2, 4], [3, 5], [4, 6], [5, 7]]
+                         [7, 13], [6, 7], [6, 8], [7, 9], [
+                             8, 10], [9, 11], [2, 3],
+                         [1, 2], [1, 3], [2, 4], [3, 5], [4, 6], [5, 7]]
 
         self.palette = [[255, 128, 0], [255, 153, 51], [255, 178, 102],
-                            [230, 230, 0], [255, 153, 255], [153, 204, 255],
-                            [255, 102, 255], [255, 51, 255], [102, 178, 255],
-                            [51, 153, 255], [255, 153, 153], [255, 102, 102],
-                            [255, 51, 51], [153, 255, 153], [102, 255, 102],
-                            [51, 255, 51], [0, 255, 0], [0, 0, 255], [255, 0, 0],
-                            [255, 255, 255]]
+                        [230, 230, 0], [255, 153, 255], [153, 204, 255],
+                        [255, 102, 255], [255, 51, 255], [102, 178, 255],
+                        [51, 153, 255], [255, 153, 153], [255, 102, 102],
+                        [255, 51, 51], [153, 255, 153], [102, 255, 102],
+                        [51, 255, 51], [0, 255, 0], [0, 0, 255], [255, 0, 0],
+                        [255, 255, 255]]
 
     def get_progress_steps(self):
         # Function returning the number of progress steps for this process
@@ -109,7 +112,8 @@ class InferYoloV8PoseEstimation(dataprocess.CKeypointDetectionTask):
 
         # Load model
         if param.update or self.model is None:
-            self.device = 1 if param.cuda else torch.device("cpu")
+            self.device = torch.device(
+                "cuda") if param.cuda else torch.device("cpu")
             self.half = True if param.cuda else False
             self.model = YOLO(f'{param.model_name}.pt')
             # Set Keypoints links
@@ -152,26 +156,29 @@ class InferYoloV8PoseEstimation(dataprocess.CKeypointDetectionTask):
             keypts = []
             kept_kp_id = []
             for link in self.get_keypoint_links():
-                kp1, kp2 = kpts_data[link.start_point_index-1], kpts_data[link.end_point_index-1]
+                kp1, kp2 = kpts_data[link.start_point_index -
+                                     1], kpts_data[link.end_point_index-1]
                 x1, y1 = kp1
                 x2, y2 = kp2
                 if link.start_point_index not in kept_kp_id:
                     kept_kp_id.append(link.start_point_index)
-                    keypts.append((link.start_point_index, dataprocess.CPointF(float(x1), float(y1))))
+                    keypts.append(
+                        (link.start_point_index, dataprocess.CPointF(float(x1), float(y1))))
                 if link.end_point_index not in kept_kp_id:
                     kept_kp_id.append(link.end_point_index)
-                    keypts.append((link.end_point_index, dataprocess.CPointF(float(x2), float(y2))))
+                    keypts.append(
+                        (link.end_point_index, dataprocess.CPointF(float(x2), float(y2))))
 
             # Add object to display
             self.add_object(
-                        i,
-                        0,
-                        float(conf),
-                        float(box_x1),
-                        float(box_y1),
-                        float(widht),
-                        float(height),
-                        keypts
+                i,
+                0,
+                float(conf),
+                float(box_x1),
+                float(box_y1),
+                float(widht),
+                float(height),
+                keypts
             )
 
         # Step progress bar (Ikomia Studio):
@@ -194,7 +201,7 @@ class InferYoloV8PoseEstimationFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Inference with YOLOv8 pose estimation models"
         self.info.description = "This algorithm proposes inference for pose estimation " \
                                 "with YOLOv8 models. " \
-        # relative path -> as displayed in Ikomia application process tree
+            # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Pose"
         self.info.version = "1.0.0"
         self.info.icon_path = "icons/icon.png"
