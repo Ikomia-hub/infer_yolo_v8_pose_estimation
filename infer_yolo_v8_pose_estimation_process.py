@@ -20,6 +20,8 @@ import copy
 from ikomia import core, dataprocess, utils
 from ultralytics import YOLO
 import torch
+import os
+from ultralytics import download
 
 # --------------------
 # - Class to handle the process parameters
@@ -91,6 +93,8 @@ class InferYoloV8PoseEstimation(dataprocess.CKeypointDetectionTask):
                         [255, 51, 51], [153, 255, 153], [102, 255, 102],
                         [51, 255, 51], [0, 255, 0], [0, 0, 255], [255, 0, 0],
                         [255, 255, 255]]
+        self.repo = 'ultralytics/assets'
+        self.version = 'v0.0.0'
 
     def get_progress_steps(self):
         # Function returning the number of progress steps for this process
@@ -115,7 +119,17 @@ class InferYoloV8PoseEstimation(dataprocess.CKeypointDetectionTask):
             self.device = torch.device(
                 "cuda") if param.cuda else torch.device("cpu")
             self.half = True if param.cuda else False
-            self.model = YOLO(f'{param.model_name}.pt')
+            # Set path
+            model_folder = os.path.join(os.path.dirname(
+                os.path.realpath(__file__)), "weights")
+            model_weights = os.path.join(
+                str(model_folder), f'{param.model_name}.pt')
+            # Download model if not exist
+            if not os.path.isfile(model_weights):
+                url = f'https://github.com/{self.repo}/releases/download/{self.version}/{param.model_name}.pt'
+                download(url=url, dir=model_folder, unzip=True)
+            self.model = YOLO(model_weights)
+
             # Set Keypoints links
             keypoint_links = []
             for (start_pt_idx, end_pt_idx), color in zip(self.skeleton, self.palette):
@@ -203,7 +217,7 @@ class InferYoloV8PoseEstimationFactory(dataprocess.CTaskFactory):
                                 "with YOLOv8 models. " \
             # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Pose"
-        self.info.version = "1.0.0"
+        self.info.version = "1.0.1"
         self.info.icon_path = "icons/icon.png"
         self.info.authors = "Jocher, G., Chaurasia, A., & Qiu, J"
         self.info.article = "YOLO by Ultralytics"
