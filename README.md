@@ -1,17 +1,17 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Ikomia-hub/infer_yolo_v8/main/icons/icon.png" alt="Algorithm icon">
-  <h1 align="center">infer_yolo_v8</h1>
+  <img src="https://raw.githubusercontent.com/Ikomia-hub/infer_yolo_v8_pose_estimation/main/icons/icon.png" alt="Algorithm icon">
+  <h1 align="center">infer_yolo_v8_pose_estimation</h1>
 </div>
 <br />
 <p align="center">
-    <a href="https://github.com/Ikomia-hub/infer_yolo_v8">
-        <img alt="Stars" src="https://img.shields.io/github/stars/Ikomia-hub/infer_yolo_v8">
+    <a href="https://github.com/Ikomia-hub/infer_yolo_v8_pose_estimation">
+        <img alt="Stars" src="https://img.shields.io/github/stars/Ikomia-hub/infer_yolo_v8_pose_estimation">
     </a>
     <a href="https://app.ikomia.ai/hub/">
         <img alt="Website" src="https://img.shields.io/website/http/app.ikomia.ai/en.svg?down_color=red&down_message=offline&up_message=online">
     </a>
-    <a href="https://github.com/Ikomia-hub/infer_yolo_v8/blob/main/LICENSE.md">
-        <img alt="GitHub" src="https://img.shields.io/github/license/Ikomia-hub/infer_yolo_v8.svg?color=blue">
+    <a href="https://github.com/Ikomia-hub/infer_yolo_v8_pose_estimation/blob/main/LICENSE.md">
+        <img alt="GitHub" src="https://img.shields.io/github/license/Ikomia-hub/infer_yolo_v8_pose_estimation.svg?color=blue">
     </a>    
     <br>
     <a href="https://discord.com/invite/82Tnw9UGGc">
@@ -21,7 +21,7 @@
 
 Run YOLOv8 pose estimation.
 
-![Desk object detection](https://raw.githubusercontent.com/Ikomia-hub/infer_yolo_v8/feat/new_readme/icons/output1.jpg)
+![MJ YOLOv8 pose estimation](https://raw.githubusercontent.com/Ikomia-hub/infer_yolo_v8_pose_estimation/feat/new_readme/icons/output1.jpg)
 
 ## :rocket: Use with Ikomia API
 
@@ -112,7 +112,7 @@ from ikomia.dataprocess.workflow import Workflow
 wf = Workflow()
 
 # Add algorithm
-algo = wf.add_task(name="infer_yolo_v8", auto_connect=True)
+algo = wf.add_task(name="infer_yolo_v8_pose_estimation", auto_connect=True)
 
 # Run on your image  
 wf.run_on(url="https://cdn.nba.com/teams/legacy/www.nba.com/bulls/sites/bulls/files/jordan_vs_indiana.jpg")
