@@ -21,7 +21,7 @@
 
 Run YOLOv8 pose estimation.
 
-![Desk object detection](https://raw.githubusercontent.com/Ikomia-hub/infer_yolo_v8/feat/new_readme/icons/output.jpg)
+![Desk object detection](https://raw.githubusercontent.com/Ikomia-hub/infer_yolo_v8/feat/new_readme/icons/output1.jpg)
 
 ## :rocket: Use with Ikomia API
 
@@ -63,7 +63,7 @@ Ikomia Studio offers a friendly UI with the same features as the API.
 
 ## :pencil: Set algorithm parameters
 
-- **model_name** (str) - default 'yolov8m': Name of the YOLOv8 pre-trained model. Other model available:
+- **model_name** (str) - default 'yolov8m-pose': Name of the YOLOv8 pre-trained model. Other model available:
     - yolov8n-pose
     - yolov8s-pose
     - yolov8l-pose
