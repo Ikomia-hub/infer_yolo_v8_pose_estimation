@@ -73,7 +73,9 @@ Ikomia Studio offers a friendly UI with the same features as the API.
 - **conf_thres** (float) default '0.25': Box threshold for the prediction [0,1].
 - **iou_thres** (float) - default '0.7': Intersection over Union, degree of overlap between two boxes [0,1].
 - **cuda** (bool): If True, CUDA-based inference (GPU). If False, run on CPU.
-- **model_weight_file** (str, *optional*): Path to model weights file .pt. 
+- **model_weight_file** (str, *optional*): Path to model weights file .pt.
+
+**Parameters** should be in **strings format**  when added to the dictionary.
 
 ```python
 from ikomia.dataprocess.workflow import Workflow
