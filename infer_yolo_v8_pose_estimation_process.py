@@ -213,9 +213,7 @@ class InferYoloV8PoseEstimationFactory(dataprocess.CTaskFactory):
         # Set process information as string here
         self.info.name = "infer_yolo_v8_pose_estimation"
         self.info.short_description = "Inference with YOLOv8 pose estimation models"
-        self.info.description = "This algorithm proposes inference for pose estimation " \
-                                "with YOLOv8 models. " \
-            # relative path -> as displayed in Ikomia application process tree
+        # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Pose"
         self.info.version = "1.0.1"
         self.info.icon_path = "icons/icon.png"
@@ -227,7 +225,8 @@ class InferYoloV8PoseEstimationFactory(dataprocess.CTaskFactory):
         # URL of documentation
         self.info.documentation_link = "https://docs.ultralytics.com/"
         # Code source repository
-        self.info.repository = "https://github.com/ultralytics/ultralytics"
+        self.info.repository = "https://github.com/Ikomia-hub/infer_yolo_v8_pose_estimation"
+        self.info.original_repository = "https://github.com/ultralytics/ultralytics"
         # Keywords used for search
         self.info.keywords = "YOLO, pose, estimation, keypoints, ultralytics, coco"
 
