@@ -21,7 +21,7 @@
 
 Run YOLOv8 pose estimation.
 
-![MJ YOLOv8 pose estimation](https://raw.githubusercontent.com/Ikomia-hub/infer_yolo_v8_pose_estimation/feat/new_readme/icons/output1.jpg)
+![MJ YOLOv8 pose estimation](https://raw.githubusercontent.com/Ikomia-hub/infer_yolo_v8_pose_estimation/main/icons/output1.jpg)
 
 ## :rocket: Use with Ikomia API
 
