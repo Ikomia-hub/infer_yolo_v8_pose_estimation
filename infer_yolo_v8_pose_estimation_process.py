@@ -118,7 +118,7 @@ class InferYoloV8PoseEstimation(dataprocess.CKeypointDetectionTask):
         if param.update or self.model is None:
             self.device = torch.device(
                 "cuda") if param.cuda and torch.cuda.is_available() else torch.device("cpu")
-            self.half = True if param.cuda else False
+            self.half = True if param.cuda and torch.cuda.is_available() else False
             # Set path
             model_folder = os.path.join(os.path.dirname(
                 os.path.realpath(__file__)), "weights")
