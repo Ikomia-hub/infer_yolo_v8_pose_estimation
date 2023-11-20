@@ -157,7 +157,7 @@ class InferYoloV8PoseEstimation(dataprocess.CKeypointDetectionTask):
         boxes = results[0].boxes.xyxy
         confidences = results[0].boxes.conf
         keypoints_lists = results[0].keypoints.xy
-
+        
         for i, (box, conf, keypoints) in enumerate(zip(boxes, confidences, keypoints_lists)):
             box = box.detach().cpu().numpy()
             keypoints = keypoints.detach().cpu().numpy()
@@ -175,14 +175,15 @@ class InferYoloV8PoseEstimation(dataprocess.CKeypointDetectionTask):
                 x1, y1 = kp1
                 x2, y2 = kp2
                 if link.start_point_index not in kept_kp_id:
-                    kept_kp_id.append(link.start_point_index)
-                    keypts.append(
-                        (link.start_point_index, dataprocess.CPointF(float(x1), float(y1))))
+                    if not [x1, y1]==[0,0]:
+                        kept_kp_id.append(link.start_point_index)
+                        keypts.append(
+                            (link.start_point_index, dataprocess.CPointF(float(x1), float(y1))))
                 if link.end_point_index not in kept_kp_id:
-                    kept_kp_id.append(link.end_point_index)
-                    keypts.append(
-                        (link.end_point_index, dataprocess.CPointF(float(x2), float(y2))))
-
+                    if not [x2, y2]==[0,0]:
+                        kept_kp_id.append(link.end_point_index)
+                        keypts.append(
+                            (link.end_point_index, dataprocess.CPointF(float(x2), float(y2))))
             # Add object to display
             self.add_object(
                 i,
