@@ -15,20 +15,20 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import copy
-from ikomia import core, dataprocess, utils
-from ultralytics import YOLO
-import torch
 import os
+
+import torch
+
+from ikomia import core, dataprocess, utils
+
+from ultralytics import YOLO
 from ultralytics import download
 
 # --------------------
 # - Class to handle the process parameters
 # - Inherits PyCore.CWorkflowTaskParam from Ikomia API
 # --------------------
-
-
 class InferYoloV8PoseEstimationParam(core.CWorkflowTaskParam):
 
     def __init__(self):
@@ -52,12 +52,13 @@ class InferYoloV8PoseEstimationParam(core.CWorkflowTaskParam):
     def get_values(self):
         # Send parameters values to Ikomia application
         # Create the specific dict structure (string container)
-        param_map = {}
-        param_map["model_name"] = str(self.model_name)
-        param_map["cuda"] = str(self.cuda)
-        param_map["input_size"] = str(self.input_size)
-        param_map["conf_thres"] = str(self.conf_thres)
-        param_map["iou_thres"] = str(self.iou_thres)
+        param_map = {
+            "model_name": str(self.model_name),
+            "cuda": str(self.cuda),
+            "input_size": str(self.input_size),
+            "conf_thres": str(self.conf_thres),
+            "iou_thres": str(self.iou_thres)
+        }
         return param_map
 
 
@@ -101,46 +102,53 @@ class InferYoloV8PoseEstimation(dataprocess.CKeypointDetectionTask):
         # This is handled by the main progress bar of Ikomia application
         return 1
 
+    def _load_model(self):
+        param = self.get_param_object()
+        self.device = torch.device("cuda") if param.cuda and torch.cuda.is_available() else torch.device("cpu")
+        self.half = True if param.cuda and torch.cuda.is_available() else False
+
+        # Set path
+        model_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "weights")
+        model_weights = os.path.join(str(model_folder), f'{param.model_name}.pt')
+
+        # Download model if not exist
+        if not os.path.isfile(model_weights):
+            url = f'https://github.com/{self.repo}/releases/download/{self.version}/{param.model_name}.pt'
+            download(url=url, dir=model_folder, unzip=True)
+
+        self.model = YOLO(model_weights)
+
+        # Set Keypoints links
+        keypoint_links = []
+        for (start_pt_idx, end_pt_idx), color in zip(self.skeleton, self.palette):
+            link = dataprocess.CKeypointLink()
+            link.start_point_index = start_pt_idx
+            link.end_point_index = end_pt_idx
+            link.color = color
+            keypoint_links.append(link)
+
+        self.set_keypoint_links(keypoint_links)
+        self.set_object_names(self.classes)
+        param.update = False
+
+    def init_long_process(self):
+        self._load_model()
+        super().init_long_process()
+
     def run(self):
         # Core function of your process
         # Call begin_task_run() for initialization
         self.begin_task_run()
         # Get parameters :
         param = self.get_param_object()
-
         # Get input :
-        input = self.get_input(0)
-
+        img_input = self.get_input(0)
         # Get image from input/output (numpy array):
-        src_image = input.get_image()
+        src_image = img_input.get_image()
 
         # Load model
-        if param.update or self.model is None:
-            self.device = torch.device(
-                "cuda") if param.cuda and torch.cuda.is_available() else torch.device("cpu")
-            self.half = True if param.cuda and torch.cuda.is_available() else False
-            # Set path
-            model_folder = os.path.join(os.path.dirname(
-                os.path.realpath(__file__)), "weights")
-            model_weights = os.path.join(
-                str(model_folder), f'{param.model_name}.pt')
-            # Download model if not exist
-            if not os.path.isfile(model_weights):
-                url = f'https://github.com/{self.repo}/releases/download/{self.version}/{param.model_name}.pt'
-                download(url=url, dir=model_folder, unzip=True)
-            self.model = YOLO(model_weights)
-
-            # Set Keypoints links
-            keypoint_links = []
-            for (start_pt_idx, end_pt_idx), color in zip(self.skeleton, self.palette):
-                link = dataprocess.CKeypointLink()
-                link.start_point_index = start_pt_idx
-                link.end_point_index = end_pt_idx
-                link.color = color
-                keypoint_links.append(link)
-            self.set_keypoint_links(keypoint_links)
-            self.set_object_names(self.classes)
-            param.update = False
+        if param.update:
+            self._load_model()
 
         # Run detection
         results = self.model.predict(
@@ -170,20 +178,23 @@ class InferYoloV8PoseEstimation(dataprocess.CKeypointDetectionTask):
             keypts = []
             kept_kp_id = []
             for link in self.get_keypoint_links():
-                kp1, kp2 = kpts_data[link.start_point_index -
-                                     1], kpts_data[link.end_point_index-1]
+                kp1, kp2 = kpts_data[link.start_point_index -1], kpts_data[link.end_point_index-1]
                 x1, y1 = kp1
                 x2, y2 = kp2
+
                 if link.start_point_index not in kept_kp_id:
                     if not [x1, y1]==[0,0]:
                         kept_kp_id.append(link.start_point_index)
                         keypts.append(
-                            (link.start_point_index, dataprocess.CPointF(float(x1), float(y1))))
+                            (link.start_point_index, dataprocess.CPointF(float(x1), float(y1)))
+                        )
+
                 if link.end_point_index not in kept_kp_id:
                     if not [x2, y2]==[0,0]:
                         kept_kp_id.append(link.end_point_index)
                         keypts.append(
-                            (link.end_point_index, dataprocess.CPointF(float(x2), float(y2))))
+                            (link.end_point_index, dataprocess.CPointF(float(x2), float(y2)))
+                        )
             # Add object to display
             self.add_object(
                 i,
@@ -216,7 +227,8 @@ class InferYoloV8PoseEstimationFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Inference with YOLOv8 pose estimation models"
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Pose"
-        self.info.version = "1.0.4"
+        self.info.version = "1.1.0"
+        self.info.min_ikomia_version = "0.15.0"
         self.info.icon_path = "icons/icon.png"
         self.info.authors = "Jocher, G., Chaurasia, A., & Qiu, J"
         self.info.article = "YOLO by Ultralytics"
@@ -232,6 +244,10 @@ class InferYoloV8PoseEstimationFactory(dataprocess.CTaskFactory):
         self.info.keywords = "YOLO, pose, estimation, keypoints, ultralytics, coco"
         self.info.algo_type = core.AlgoType.INFER
         self.info.algo_tasks = "KEYPOINTS_DETECTION"
+        self.info.hardware_config.min_cpu = 4
+        self.info.hardware_config.min_ram = 16
+        self.info.hardware_config.gpu_required = False
+        self.info.hardware_config.min_vram = 6
 
     def create(self, param=None):
         # Create process object
